@@ -1042,6 +1042,24 @@ class ScenarioRoadTraffic(BaseScenario):
             )
             world.add_agent(agent)
 
+    def communication_statistics(self) -> dict:
+        """Return JSON-compatible communication statistics for this scenario."""
+        if self.communication_adapter is None:
+            return {
+                "active": False,
+                "cache_active": False,
+                "mode": getattr(
+                    self.parameters,
+                    "communication_mode",
+                    "perfect",
+                ),
+            }
+
+        statistics = dict(self.communication_adapter.statistics())
+        statistics["active"] = True
+        statistics["cache_active"] = self.communication_cache is not None
+        return statistics
+
     def _reset_communication_cache(
         self,
         env_index: int = None,
