@@ -185,17 +185,32 @@ class CommunicationCache:
         self.valid[env, ego, source] = True
         self.last_update_step[env, ego, source] = step_tensor
 
-    def age(self, current_step: int) -> torch.Tensor:
-        """Return age for every cache entry; invalid entries have age -1."""
+    def age(self, current_step) -> torch.Tensor:
+        """Return age for every cache entry.
+
+        ``current_step`` may be either:
+        - a scalar, which is broadcast to every environment; or
+        - one integer step value per environment.
+        """
         current = torch.as_tensor(
             current_step,
             device=self.device,
             dtype=torch.long,
-        )
-        if current.numel() != 1:
-            raise ValueError("current_step must be scalar")
+        ).reshape(-1)
 
-        ages = current.reshape(()) - self.last_update_step
+        if current.numel() == 1:
+            current = current.expand(self.batch_size)
+        elif current.numel() == self.batch_size:
+            current = current.reshape(self.batch_size)
+        else:
+            raise ValueError(
+                "current_step must be scalar or contain one value per environment"
+            )
+
+        if bool(torch.any(current < 0).item()):
+            raise ValueError("current_step values must be non-negative")
+
+        ages = current[:, None, None] - self.last_update_step
         invalid_age = torch.full_like(ages, -1)
         return torch.where(self.valid, ages, invalid_age)
 
