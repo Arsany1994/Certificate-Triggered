@@ -63,6 +63,7 @@ from utilities.helper_scenario import (
 from utilities.map_manager import MapManager
 
 from utilities.constants import SCENARIOS, AGENTS
+from utilities.communication_adapter import CommunicationAdapter
 
 
 class ScenarioRoadTraffic(BaseScenario):
@@ -344,6 +345,7 @@ class ScenarioRoadTraffic(BaseScenario):
         # Lazily activated by the communication adapter.
         # None preserves the original SigmaRL behavior.
         self.communication_cache = None
+        self.communication_adapter = None
 
         # Timer for the first env
         self.timer = Timer(
@@ -2398,6 +2400,31 @@ class ScenarioRoadTraffic(BaseScenario):
                 # Determine the current lanelet IDs of all agents of all envs for later use
                 self.map.determine_current_lanelet(positions_global)
 
+    def _get_communication_adapter(
+        self,
+        payload_dim: int,
+    ) -> CommunicationAdapter:
+        """Return the lazily created neighbor-communication adapter."""
+        if self.communication_adapter is None:
+            self.communication_adapter = CommunicationAdapter(
+                batch_size=self.world.batch_dim,
+                n_agents=self.n_agents,
+                mode=self.parameters.communication_mode,
+                period_steps=self.parameters.communication_period_steps,
+                max_age_steps=self.parameters.communication_max_age_steps,
+            )
+
+        if (
+            self.communication_adapter.payload_dim is not None
+            and self.communication_adapter.payload_dim != int(payload_dim)
+        ):
+            raise ValueError(
+                "Neighbor communication payload dimension changed "
+                "during one environment run."
+            )
+
+        return self.communication_adapter
+
     def _observe_other_agents(self, agent_index):
         """Observe surrounding agents."""
         ##################################################
@@ -2555,7 +2582,27 @@ class ScenarioRoadTraffic(BaseScenario):
                 indexing_tuple_2
             ]
 
-        # Flatten the last dimensions to combine all features into a single dimension
+        # Identify the globally indexed source agents represented by
+        # each neighbor slot.
+        if self.parameters.is_partial_observation:
+            source_indices = (
+                self.observations.nearing_agents_indices[:, agent_index]
+                .to(dtype=torch.long)
+            )
+            eligible_mask = (
+                (~masked_agents)
+                & (source_indices != int(agent_index))
+            )
+        else:
+            source_indices = torch.arange(
+                self.n_agents,
+                device=self.world.device,
+                dtype=torch.long,
+            ).reshape(1, -1).expand(self.world.batch_dim, -1)
+            eligible_mask = source_indices != int(agent_index)
+
+        # Flatten the last dimensions to combine all features into a
+        # per-neighbor payload.
         obs_pos_other_agents_flat = obs_pos_other_agents.reshape(
             self.world.batch_dim, self.observations.n_nearing_agents, -1
         )
@@ -2581,39 +2628,122 @@ class ScenarioRoadTraffic(BaseScenario):
             self.world.batch_dim, self.observations.n_nearing_agents, -1
         )
 
-        # Observation of other agents
-        obs_others_list = [
-            (
-                obs_vertices_other_agents_flat
-                if self.parameters.is_observe_vertices
-                else torch.cat(  # [other] vertices
-                    [
-                        obs_pos_other_agents_flat,  # [others] positions
-                        obs_rot_other_agents_flat,  # [others] rotations
-                        obs_lengths_other_agents_flat,  # [others] lengths
-                        obs_widths_other_agents_flat,  # [others] widths
-                    ],
-                    dim=-1,
-                )
-            ),
-            obs_vel_other_agents_flat,  # [others] velocities
+        mask_one = torch.as_tensor(
+            self.constants.mask_one,
+            device=self.world.device,
+            dtype=obs_vel_other_agents_flat.dtype,
+        )
+        mask_zero = torch.as_tensor(
+            self.constants.mask_zero,
+            device=self.world.device,
+            dtype=obs_vel_other_agents_flat.dtype,
+        )
+
+        if self.parameters.is_observe_vertices:
+            current_geometry = obs_vertices_other_agents_flat
+            fallback_geometry = (
+                torch.ones_like(current_geometry) * mask_one
+            )
+        else:
+            current_geometry = torch.cat(
+                [
+                    obs_pos_other_agents_flat,
+                    obs_rot_other_agents_flat,
+                    obs_lengths_other_agents_flat,
+                    obs_widths_other_agents_flat,
+                ],
+                dim=-1,
+            )
+            fallback_geometry = torch.cat(
+                [
+                    torch.ones_like(obs_pos_other_agents_flat) * mask_one,
+                    torch.zeros_like(obs_rot_other_agents_flat) + mask_zero,
+                    torch.ones_like(obs_lengths_other_agents_flat) * mask_one,
+                    torch.ones_like(obs_widths_other_agents_flat) * mask_one,
+                ],
+                dim=-1,
+            )
+
+        current_features = [
+            current_geometry,
+            obs_vel_other_agents_flat,
             (
                 obs_distance_other_agents_flat
                 if self.parameters.is_observe_distance_to_agents
                 else None
-            ),  # [others] mutual distances
+            ),
             (
                 obs_ref_path_other_agents_flat
                 if self.parameters.is_observe_ref_path_other_agents
                 else None
-            ),  # [others] reference paths
+            ),
         ]
-        obs_others_list = [
-            o for o in obs_others_list if o is not None
-        ]  # Filter out None values
-        obs_other_agents = torch.cat(obs_others_list, dim=-1).reshape(
-            self.world.batch_dim, -1
-        )  # [batch_size, -1]
+        fallback_features = [
+            fallback_geometry,
+            torch.zeros_like(obs_vel_other_agents_flat) + mask_zero,
+            (
+                torch.ones_like(obs_distance_other_agents_flat) * mask_one
+                if self.parameters.is_observe_distance_to_agents
+                else None
+            ),
+            (
+                torch.ones_like(obs_ref_path_other_agents_flat) * mask_one
+                if self.parameters.is_observe_ref_path_other_agents
+                else None
+            ),
+        ]
+
+        current_features = [item for item in current_features if item is not None]
+        fallback_features = [
+            item for item in fallback_features if item is not None
+        ]
+
+        current_payload = torch.cat(current_features, dim=-1)
+        fallback_payload = torch.cat(fallback_features, dim=-1)
+
+        # If a full observation includes the ego vehicle as one slot,
+        # preserve the ego-local features rather than treating them as
+        # received communication.
+        ego_slot_mask = (
+            source_indices == int(agent_index)
+        ).unsqueeze(-1)
+        fallback_payload = torch.where(
+            ego_slot_mask,
+            current_payload,
+            fallback_payload,
+        )
+
+        if self.parameters.communication_mode == "certificate":
+            raise RuntimeError(
+                "Certificate communication is not active yet. "
+                "Implement the independent safety certificate before "
+                "using communication_mode='certificate'."
+            )
+
+        adapter = self._get_communication_adapter(
+            payload_dim=current_payload.shape[-1],
+        )
+        communication_result = adapter.apply(
+            current_payload=current_payload.unsqueeze(1),
+            source_indices=source_indices.unsqueeze(1),
+            current_step=self.timer.step,
+            fallback_payload=fallback_payload.unsqueeze(1),
+            eligible_mask=eligible_mask.unsqueeze(1),
+            ego_indices=torch.tensor(
+                [agent_index],
+                device=self.world.device,
+                dtype=torch.long,
+            ),
+        )
+
+        # Expose the same cache object to reset_world_at(), which already
+        # clears communication state during environment/agent resets.
+        self.communication_cache = adapter.cache
+
+        obs_other_agents = communication_result.payload[:, 0].reshape(
+            self.world.batch_dim,
+            -1,
+        )
 
         return obs_other_agents
 
