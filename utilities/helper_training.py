@@ -799,6 +799,7 @@ class Parameters:
         is_using_opponent_modeling: bool = False,  # Whether to use opponent modeling to predict the actions of other agents
         is_using_prioritized_marl: bool = False,  # Whether to use prioritized MARL and action propagation.
         prioritization_method: str = "marl",  # Which method to use for generating priority ranks (options: {"marl", "random"}). Applicable only for prioritized MARL scenarios.
+        communication_mode: str = "perfect",
     ):
 
         self.n_agents = n_agents
@@ -879,6 +880,19 @@ class Parameters:
         self.is_using_prioritized_marl = is_using_prioritized_marl
 
         self.prioritization_method = prioritization_method
+
+        self.communication_mode = str(communication_mode).lower()
+        allowed_communication_modes = {
+            "perfect",
+            "periodic",
+            "age",
+            "certificate",
+        }
+        if self.communication_mode not in allowed_communication_modes:
+            raise ValueError(
+                "communication_mode must be one of: "
+                + ", ".join(sorted(allowed_communication_modes))
+            )
 
         if (model_name is None) and (scenario_name is not None):
             self.model_name = get_model_name(self)
