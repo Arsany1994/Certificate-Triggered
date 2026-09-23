@@ -64,6 +64,10 @@ from utilities.map_manager import MapManager
 
 from utilities.constants import SCENARIOS, AGENTS
 from utilities.communication_adapter import CommunicationAdapter
+from utilities.safety_certificate import (
+    evaluate_safety_certificate,
+    rectangle_circumradius,
+)
 
 
 class ScenarioRoadTraffic(BaseScenario):
@@ -346,6 +350,7 @@ class ScenarioRoadTraffic(BaseScenario):
         # None preserves the original SigmaRL behavior.
         self.communication_cache = None
         self.communication_adapter = None
+        self.last_certificate = None
 
         # Timer for the first env
         self.timer = Timer(
@@ -2443,6 +2448,107 @@ class ScenarioRoadTraffic(BaseScenario):
 
         return self.communication_adapter
 
+    def _certificate_trigger_mask(
+        self,
+        adapter: CommunicationAdapter,
+        current_payload: torch.Tensor,
+        source_indices: torch.Tensor,
+        eligible_mask: torch.Tensor,
+        current_step,
+        agent_index: int,
+    ) -> torch.Tensor:
+        """Compute refresh requests from cached information only."""
+
+        adapter.prepare_cache(
+            payload_dim=current_payload.shape[-1],
+            device=current_payload.device,
+            dtype=current_payload.dtype,
+        )
+
+        cached_payload, cached_valid, cached_age = adapter.cached_view(
+            source_indices=source_indices.unsqueeze(1),
+            current_step=current_step,
+            ego_indices=torch.tensor(
+                [agent_index],
+                device=current_payload.device,
+                dtype=torch.long,
+            ),
+        )
+
+        # Remove the one-element ego-subset dimension.
+        cached_payload = cached_payload[:, 0]
+        cached_valid = cached_valid[:, 0]
+        cached_age = cached_age[:, 0]
+
+        # Use cached center distance rather than cached coordinates.
+        # In ego view, cached coordinates belong to the historical ego frame.
+        # Distance is invariant to that frame's rotation and translation.
+        if not self.parameters.is_observe_distance_to_agents:
+            raise ValueError(
+                "Certificate mode requires observed inter-agent distance."
+            )
+
+        geometry_dim = 8 if self.parameters.is_observe_vertices else 5
+        velocity_dim = 2
+        distance_index = geometry_dim + velocity_dim
+
+        if cached_payload.shape[-1] <= distance_index:
+            raise ValueError(
+                "Certificate payload does not contain the expected "
+                "inter-agent distance feature."
+            )
+
+        cached_distance_normalized = cached_payload[..., distance_index]
+        center_distance_m = (
+            cached_distance_normalized * self.normalizers.distance_agent
+        ).clamp_min(0.0)
+
+        # Reuse the position-based certificate API with an arbitrary radial
+        # coordinate. Only the Euclidean distance is used by the certificate.
+        ego_position_m = torch.zeros(
+            center_distance_m.shape + (2,),
+            device=current_payload.device,
+            dtype=current_payload.dtype,
+        )
+        peer_position_m = torch.zeros_like(ego_position_m)
+        peer_position_m[..., 0] = center_distance_m
+
+        vehicle_radius_m = rectangle_circumradius(
+            length_m=self.agent_length,
+            width_m=self.agent_width,
+        ).to(
+            device=current_payload.device,
+            dtype=current_payload.dtype,
+        )
+
+        certificate = evaluate_safety_certificate(
+            ego_position_m=ego_position_m,
+            peer_position_m=peer_position_m,
+            age_steps=cached_age,
+            dt_s=float(self.world.dt),
+            ego_radius_m=vehicle_radius_m,
+            peer_radius_m=vehicle_radius_m,
+            relative_speed_bound_mps=(
+                self.parameters.certificate_relative_speed_bound_mps
+            ),
+            base_position_error_m=(
+                self.parameters.certificate_base_position_error_m
+            ),
+            required_clearance_m=(
+                self.parameters.certificate_required_clearance_m
+            ),
+            trigger_threshold_m=(
+                self.parameters.certificate_trigger_threshold_m
+            ),
+            cache_valid=(cached_valid & eligible_mask),
+        )
+
+        self.last_certificate = certificate
+
+        return (
+            certificate.request_refresh & eligible_mask
+        ).unsqueeze(1)
+
     def _observe_other_agents(self, agent_index):
         """Observe surrounding agents."""
         ##################################################
@@ -2731,22 +2837,29 @@ class ScenarioRoadTraffic(BaseScenario):
             fallback_payload,
         )
 
-        if self.parameters.communication_mode == "certificate":
-            raise RuntimeError(
-                "Certificate communication is not active yet. "
-                "Implement the independent safety certificate before "
-                "using communication_mode='certificate'."
-            )
-
         adapter = self._get_communication_adapter(
             payload_dim=current_payload.shape[-1],
         )
+
+        certificate_trigger_mask = None
+
+        if self.parameters.communication_mode == "certificate":
+            certificate_trigger_mask = self._certificate_trigger_mask(
+                adapter=adapter,
+                current_payload=current_payload,
+                source_indices=source_indices,
+                eligible_mask=eligible_mask,
+                current_step=self.timer.step,
+                agent_index=agent_index,
+            )
+
         communication_result = adapter.apply(
             current_payload=current_payload.unsqueeze(1),
             source_indices=source_indices.unsqueeze(1),
             current_step=self.timer.step,
             fallback_payload=fallback_payload.unsqueeze(1),
             eligible_mask=eligible_mask.unsqueeze(1),
+            trigger_mask=certificate_trigger_mask,
             ego_indices=torch.tensor(
                 [agent_index],
                 device=self.world.device,
