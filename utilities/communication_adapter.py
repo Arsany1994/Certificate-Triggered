@@ -52,6 +52,8 @@ class CommunicationAdapter:
         self.total_age_sum = 0
         self.total_age_samples = 0
         self.max_age_seen = -1
+        self.total_certificate_evaluations = 0
+        self.total_certificate_refresh_requests = 0
 
         if self.mode not in {"perfect", "periodic", "age", "certificate"}:
             raise ValueError(
@@ -84,6 +86,8 @@ class CommunicationAdapter:
         self.total_age_sum = 0
         self.total_age_samples = 0
         self.max_age_seen = -1
+        self.total_certificate_evaluations = 0
+        self.total_certificate_refresh_requests = 0
 
     def _record_statistics(
         self,
@@ -144,6 +148,10 @@ class CommunicationAdapter:
             "fallback_events": self.total_fallback_events,
             "mean_valid_information_age": mean_age,
             "max_valid_information_age": self.max_age_seen,
+            "certificate_evaluations": self.total_certificate_evaluations,
+            "certificate_refresh_requests": (
+                self.total_certificate_refresh_requests
+            ),
         }
 
     def _normalise_steps(
@@ -194,6 +202,116 @@ class CommunicationAdapter:
     def reset(self, env_mask=None) -> None:
         if self.cache is not None:
             self.cache.reset(env_mask)
+
+    def prepare_cache(
+        self,
+        payload_dim: int,
+        device: torch.device,
+        dtype: torch.dtype,
+    ) -> None:
+        """Create the cache without receiving or transmitting a message."""
+        self._ensure_cache(
+            payload_dim=int(payload_dim),
+            device=device,
+            dtype=dtype,
+        )
+
+    def cached_view(
+        self,
+        source_indices: torch.Tensor,
+        current_step,
+        ego_indices: Optional[torch.Tensor] = None,
+    ):
+        """Return cached payload, validity, and age for requested slots."""
+        if self.cache is None:
+            raise RuntimeError(
+                "prepare_cache() must be called before cached_view()"
+            )
+
+        source_indices = torch.as_tensor(
+            source_indices,
+            device=self.cache.device,
+            dtype=torch.long,
+        )
+
+        if source_indices.ndim != 3:
+            raise ValueError(
+                "source_indices must have shape "
+                "[batch, ego_subset, neighbor_slot]"
+            )
+
+        batch, n_ego, n_slots = source_indices.shape
+
+        if batch != self.batch_size:
+            raise ValueError("source_indices batch dimension mismatch")
+
+        if bool(torch.any(source_indices < 0).item()) or bool(
+            torch.any(source_indices >= self.n_agents).item()
+        ):
+            raise IndexError("source_indices contains an invalid agent ID")
+
+        if ego_indices is None:
+            if n_ego != self.n_agents:
+                raise ValueError(
+                    "ego_indices is required when processing an ego subset"
+                )
+
+            ego_ids = torch.arange(
+                self.n_agents,
+                device=self.cache.device,
+                dtype=torch.long,
+            )
+        else:
+            ego_ids = torch.as_tensor(
+                ego_indices,
+                device=self.cache.device,
+                dtype=torch.long,
+            ).reshape(-1)
+
+            if ego_ids.numel() != n_ego:
+                raise ValueError(
+                    "ego_indices must contain one ID per ego dimension"
+                )
+
+            if bool(torch.any(ego_ids < 0).item()) or bool(
+                torch.any(ego_ids >= self.n_agents).item()
+            ):
+                raise IndexError("ego_indices contains an invalid agent ID")
+
+        steps = self._normalise_steps(
+            current_step,
+            self.cache.device,
+        )
+
+        env_grid = torch.arange(
+            batch,
+            device=self.cache.device,
+            dtype=torch.long,
+        ).reshape(batch, 1, 1).expand(batch, n_ego, n_slots)
+
+        ego_grid = ego_ids.reshape(
+            1, n_ego, 1
+        ).expand(batch, n_ego, n_slots)
+
+        cached_payload = self.cache.messages[
+            env_grid,
+            ego_grid,
+            source_indices,
+        ]
+
+        cached_valid = self.cache.valid[
+            env_grid,
+            ego_grid,
+            source_indices,
+        ]
+
+        cached_age = self.cache.age(steps)[
+            env_grid,
+            ego_grid,
+            source_indices,
+        ]
+
+        return cached_payload, cached_valid, cached_age
 
     def apply(
         self,
@@ -388,10 +506,20 @@ class CommunicationAdapter:
                     "trigger_mask is required for certificate communication"
                 )
 
-            send_mask = trigger_mask.to(
+            certificate_trigger = trigger_mask.to(
                 device=device,
                 dtype=torch.bool,
             )
+
+            self.total_certificate_evaluations += int(
+                eligible_mask.sum().item()
+            )
+
+            self.total_certificate_refresh_requests += int(
+                (certificate_trigger & eligible_mask).sum().item()
+            )
+
+            send_mask = certificate_trigger
 
         if tuple(send_mask.shape) != (batch, n_ego, n_slots):
             raise ValueError("trigger_mask shape mismatch")
