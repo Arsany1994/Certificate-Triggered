@@ -113,53 +113,97 @@ class CommunicationAdapter:
         fallback_payload: torch.Tensor,
         eligible_mask: Optional[torch.Tensor] = None,
         trigger_mask: Optional[torch.Tensor] = None,
+        ego_indices: Optional[torch.Tensor] = None,
     ) -> CommunicationResult:
         """Apply one common communication decision.
 
         Shapes:
-            current_payload: [batch, ego, neighbor_slot, payload_dim]
-            source_indices:  [batch, ego, neighbor_slot]
+            current_payload: [batch, ego_subset, neighbor_slot, payload_dim]
+            source_indices:  [batch, ego_subset, neighbor_slot]
             fallback_payload: same shape as current_payload
-            eligible_mask:   [batch, ego, neighbor_slot]
+            eligible_mask:   [batch, ego_subset, neighbor_slot]
+            ego_indices:     global ego-agent IDs for the subset
             trigger_mask:    required only for certificate mode
         """
         if current_payload.ndim != 4:
             raise ValueError("current_payload must have four dimensions")
 
-        batch, n_agents, n_slots, payload_dim = current_payload.shape
+        batch, n_ego, n_slots, payload_dim = current_payload.shape
 
-        if batch != self.batch_size or n_agents != self.n_agents:
-            raise ValueError("current_payload batch or agent dimension mismatch")
+        if batch != self.batch_size:
+            raise ValueError("current_payload batch dimension mismatch")
 
-        if tuple(source_indices.shape) != (batch, n_agents, n_slots):
+        device = current_payload.device
+
+        if ego_indices is None:
+            if n_ego != self.n_agents:
+                raise ValueError(
+                    "ego_indices is required when processing an ego subset"
+                )
+            ego_ids = torch.arange(
+                self.n_agents,
+                device=device,
+                dtype=torch.long,
+            )
+        else:
+            ego_ids = torch.as_tensor(
+                ego_indices,
+                device=device,
+                dtype=torch.long,
+            ).reshape(-1)
+
+            if ego_ids.numel() != n_ego:
+                raise ValueError(
+                    "ego_indices must contain one ID per ego dimension"
+                )
+
+            if bool(torch.any(ego_ids < 0).item()) or bool(
+                torch.any(ego_ids >= self.n_agents).item()
+            ):
+                raise IndexError("ego_indices contains an invalid agent ID")
+
+        if tuple(source_indices.shape) != (batch, n_ego, n_slots):
             raise ValueError("source_indices shape mismatch")
 
         if tuple(fallback_payload.shape) != tuple(current_payload.shape):
             raise ValueError("fallback_payload shape mismatch")
 
-        device = current_payload.device
-        source_indices = source_indices.to(device=device, dtype=torch.long)
+        source_indices = source_indices.to(
+            device=device,
+            dtype=torch.long,
+        )
+        fallback_payload = fallback_payload.to(
+            device=device,
+            dtype=current_payload.dtype,
+        )
         steps = self._normalise_steps(current_step, device)
 
         if eligible_mask is None:
             eligible_mask = torch.ones(
                 batch,
-                n_agents,
+                n_ego,
                 n_slots,
                 device=device,
                 dtype=torch.bool,
             )
         else:
-            eligible_mask = eligible_mask.to(device=device, dtype=torch.bool)
+            eligible_mask = eligible_mask.to(
+                device=device,
+                dtype=torch.bool,
+            )
 
-        if tuple(eligible_mask.shape) != (batch, n_agents, n_slots):
+        if tuple(eligible_mask.shape) != (batch, n_ego, n_slots):
             raise ValueError("eligible_mask shape mismatch")
 
         if self.mode == "perfect":
             send_mask = eligible_mask.clone()
             age = torch.zeros_like(source_indices)
             messages = int(send_mask.sum().item())
-            bytes_sent = messages * payload_dim * current_payload.element_size()
+            bytes_sent = (
+                messages
+                * payload_dim
+                * current_payload.element_size()
+            )
 
             return CommunicationResult(
                 payload=current_payload,
@@ -179,32 +223,42 @@ class CommunicationAdapter:
         )
 
         env_grid = torch.arange(
-            batch, device=device, dtype=torch.long
-        ).reshape(batch, 1, 1).expand(batch, n_agents, n_slots)
-
-        ego_grid = torch.arange(
-            n_agents, device=device, dtype=torch.long
-        ).reshape(1, n_agents, 1).expand(batch, n_agents, n_slots)
-
-        step_grid = steps.reshape(batch, 1, 1).expand(
-            batch, n_agents, n_slots
+            batch,
+            device=device,
+            dtype=torch.long,
+        ).reshape(batch, 1, 1).expand(
+            batch, n_ego, n_slots
         )
 
+        ego_grid = ego_ids.reshape(
+            1, n_ego, 1
+        ).expand(batch, n_ego, n_slots)
+
+        step_grid = steps.reshape(
+            batch, 1, 1
+        ).expand(batch, n_ego, n_slots)
+
         cached_payload = self.cache.messages[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
         cached_valid = self.cache.valid[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
         cached_age = self.cache.age(steps)[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
 
         if self.mode == "periodic":
             send_mask = (
                 (steps % int(self.period_steps))
                 .reshape(batch, 1, 1)
-                .expand(batch, n_agents, n_slots)
+                .expand(batch, n_ego, n_slots)
                 == 0
             )
         elif self.mode == "age":
@@ -217,12 +271,18 @@ class CommunicationAdapter:
                 raise ValueError(
                     "trigger_mask is required for certificate communication"
                 )
-            send_mask = trigger_mask.to(device=device, dtype=torch.bool)
 
-        if tuple(send_mask.shape) != (batch, n_agents, n_slots):
+            send_mask = trigger_mask.to(
+                device=device,
+                dtype=torch.bool,
+            )
+
+        if tuple(send_mask.shape) != (batch, n_ego, n_slots):
             raise ValueError("trigger_mask shape mismatch")
 
         send_mask = send_mask & eligible_mask
+
+        # Never leave an eligible source without an initial message.
         send_mask = send_mask | ((~cached_valid) & eligible_mask)
 
         flat_send = send_mask.reshape(-1)
@@ -238,16 +298,23 @@ class CommunicationAdapter:
             )
 
         cached_payload = self.cache.messages[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
         cached_valid = self.cache.valid[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
         cached_age = self.cache.age(steps)[
-            env_grid, ego_grid, source_indices
+            env_grid,
+            ego_grid,
+            source_indices,
         ]
 
         usable = cached_valid & eligible_mask
+
         output_payload = torch.where(
             usable.unsqueeze(-1),
             cached_payload,
@@ -255,7 +322,11 @@ class CommunicationAdapter:
         )
 
         messages = int(send_mask.sum().item())
-        bytes_sent = messages * payload_dim * current_payload.element_size()
+        bytes_sent = (
+            messages
+            * payload_dim
+            * current_payload.element_size()
+        )
 
         return CommunicationResult(
             payload=output_payload,

@@ -138,6 +138,36 @@ def main() -> None:
     assert certificate_result.messages_sent == 0
     print("ADAPTER certificate interface: external trigger respected")
 
+    single_ego = CommunicationAdapter(
+        batch_size=1,
+        n_agents=3,
+        mode="periodic",
+        period_steps=2,
+    )
+
+    single_result = single_ego.apply(
+        current_payload=torch.tensor(
+            [[[[9.0, 10.0]]]]
+        ),
+        source_indices=torch.tensor(
+            [[[2]]],
+            dtype=torch.long,
+        ),
+        ego_indices=torch.tensor([1]),
+        current_step=torch.tensor([0]),
+        fallback_payload=torch.full(
+            (1, 1, 1, 2),
+            -9.0,
+        ),
+    )
+
+    assert torch.equal(
+        single_result.payload,
+        torch.tensor([[[[9.0, 10.0]]]]),
+    )
+    assert single_ego.cache.valid[0, 1, 2].item()
+    print("ADAPTER single ego: global ego/source identity preserved")
+
     print("PASS: communication adapter modes and fallback behavior")
 
 
