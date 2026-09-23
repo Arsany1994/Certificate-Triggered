@@ -20,7 +20,7 @@ expected_commit = "5fe715bdfba4ff3e33d901d69dfa220f1222c060"
 commit = subprocess.check_output(
     ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
 ).strip()
-assert commit.startswith("0659c2d"), f"Unexpected proposed commit: {commit}"
+assert commit.startswith("9419de9"), f"Unexpected proposed commit: {commit}"
 
 tracked_diff = subprocess.check_output(
     ["git", "-C", str(repo), "diff", "HEAD", "--"], text=True
