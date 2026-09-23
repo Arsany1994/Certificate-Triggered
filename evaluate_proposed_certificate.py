@@ -161,9 +161,46 @@ try:
             f"Unsupported communication mode: {communication_mode}"
         )
 
+    def parse_optional_int(name):
+        raw = os.environ.get(name)
+        if raw is None or raw.strip().lower() in {"", "none", "null"}:
+            return None
+        return int(raw)
+
+    communication_period_steps = parse_optional_int(
+        "PAPER2_COMMUNICATION_PERIOD_STEPS"
+    )
+    communication_max_age_steps = parse_optional_int(
+        "PAPER2_COMMUNICATION_MAX_AGE_STEPS"
+    )
+
+    if communication_mode == "periodic":
+        if (
+            communication_period_steps is None
+            or communication_period_steps <= 0
+        ):
+            raise ValueError(
+                "Periodic evaluation requires "
+                "PAPER2_COMMUNICATION_PERIOD_STEPS > 0"
+            )
+
+    if communication_mode == "age":
+        if (
+            communication_max_age_steps is None
+            or communication_max_age_steps < 0
+        ):
+            raise ValueError(
+                "Age evaluation requires "
+                "PAPER2_COMMUNICATION_MAX_AGE_STEPS >= 0"
+            )
+
     evaluator.parameters.communication_mode = communication_mode
-    evaluator.parameters.communication_period_steps = None
-    evaluator.parameters.communication_max_age_steps = None
+    evaluator.parameters.communication_period_steps = (
+        communication_period_steps
+    )
+    evaluator.parameters.communication_max_age_steps = (
+        communication_max_age_steps
+    )
     evaluator._adjust_parameters()
 
     (run / "effective_evaluation_parameters.json").write_text(
@@ -202,6 +239,8 @@ try:
     assert communication_statistics["messages_sent"] > 0
 
     manifest["communication_mode"] = communication_mode
+    manifest["communication_period_steps"] = communication_period_steps
+    manifest["communication_max_age_steps"] = communication_max_age_steps
     manifest["communication_statistics"] = communication_statistics
 
     (run / "communication_statistics.json").write_text(
