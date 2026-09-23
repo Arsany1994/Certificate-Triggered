@@ -113,6 +113,39 @@ class CommunicationCache:
         self.valid[mask] = False
         self.last_update_step[mask] = -1
 
+    def reset_agents(self, env_indices, agent_indices) -> None:
+        """Invalidate incoming and outgoing messages for reset agents.
+
+        Both directions are cleared:
+        - ego agent receives from all sources;
+        - all egos receive from the reset source agent.
+        """
+        env = self._indices(
+            env_indices,
+            name="env_indices",
+            upper_bound=self.batch_size,
+        )
+        agent = self._indices(
+            agent_indices,
+            name="agent_indices",
+            upper_bound=self.n_agents,
+        )
+
+        if env.numel() != agent.numel():
+            raise ValueError(
+                "env_indices and agent_indices must have the same number of entries"
+            )
+
+        for env_i, agent_i in zip(env.tolist(), agent.tolist()):
+            self.messages[env_i, agent_i, :] = 0
+            self.messages[env_i, :, agent_i] = 0
+
+            self.valid[env_i, agent_i, :] = False
+            self.valid[env_i, :, agent_i] = False
+
+            self.last_update_step[env_i, agent_i, :] = -1
+            self.last_update_step[env_i, :, agent_i] = -1
+
     def update(
         self,
         env_indices,

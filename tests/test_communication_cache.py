@@ -109,6 +109,52 @@ def main() -> None:
         f"ages={selected_ages.tolist()}"
     )
 
+    agent_cache = CommunicationCache(
+        batch_size=1,
+        n_agents=3,
+        payload_dim=2,
+        device="cpu",
+    )
+
+    agent_cache.update(
+        env_indices=[0],
+        ego_indices=[0],
+        source_indices=[1],
+        payload=torch.tensor([[1.0, 2.0]]),
+        step=3,
+    )
+
+    agent_cache.update(
+        env_indices=[0],
+        ego_indices=[2],
+        source_indices=[0],
+        payload=torch.tensor([[3.0, 4.0]]),
+        step=3,
+    )
+
+    agent_cache.reset_agents(
+        env_indices=[0],
+        agent_indices=[0],
+    )
+
+    _, valid_incoming, age_incoming = agent_cache.read(
+        [0], [0], [1], current_step=4
+    )
+    _, valid_outgoing, age_outgoing = agent_cache.read(
+        [0], [2], [0], current_step=4
+    )
+
+    assert not bool(valid_incoming.item())
+    assert age_incoming.item() == -1
+    assert not bool(valid_outgoing.item())
+    assert age_outgoing.item() == -1
+
+    print(
+        "CACHE agent reset: "
+        f"incoming_valid={bool(valid_incoming.item())}, "
+        f"outgoing_valid={bool(valid_outgoing.item())}"
+    )
+
     print("PASS: communication cache receive, aging, refresh, and reset")
 
 
