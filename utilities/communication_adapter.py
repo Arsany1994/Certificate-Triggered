@@ -38,6 +38,20 @@ class CommunicationAdapter:
         self.max_age_steps = max_age_steps
         self.cache = None
         self.payload_dim = None
+        self.payload_element_size = None
+
+        self.total_apply_calls = 0
+        self.total_slots = 0
+        self.total_eligible_slots = 0
+        self.total_messages_sent = 0
+        self.total_messages_received = 0
+        self.total_bytes_sent = 0
+        self.total_bytes_received = 0
+        self.total_valid_slots = 0
+        self.total_fallback_events = 0
+        self.total_age_sum = 0
+        self.total_age_samples = 0
+        self.max_age_seen = -1
 
         if self.mode not in {"perfect", "periodic", "age", "certificate"}:
             raise ValueError(
@@ -55,6 +69,82 @@ class CommunicationAdapter:
                 raise ValueError(
                     "max_age_steps must be non-negative for age communication"
                 )
+
+    def reset_statistics(self) -> None:
+        """Reset cumulative communication counters without clearing cache state."""
+        self.total_apply_calls = 0
+        self.total_slots = 0
+        self.total_eligible_slots = 0
+        self.total_messages_sent = 0
+        self.total_messages_received = 0
+        self.total_bytes_sent = 0
+        self.total_bytes_received = 0
+        self.total_valid_slots = 0
+        self.total_fallback_events = 0
+        self.total_age_sum = 0
+        self.total_age_samples = 0
+        self.max_age_seen = -1
+
+    def _record_statistics(
+        self,
+        *,
+        send_mask: torch.Tensor,
+        valid_mask: torch.Tensor,
+        age: torch.Tensor,
+        eligible_mask: torch.Tensor,
+        messages_sent: int,
+        messages_received: int,
+        bytes_sent: int,
+        bytes_received: int,
+    ) -> None:
+        """Accumulate statistics for one adapter application."""
+        self.total_apply_calls += 1
+        self.total_slots += int(eligible_mask.numel())
+        self.total_eligible_slots += int(eligible_mask.sum().item())
+        self.total_messages_sent += int(messages_sent)
+        self.total_messages_received += int(messages_received)
+        self.total_bytes_sent += int(bytes_sent)
+        self.total_bytes_received += int(bytes_received)
+
+        valid_eligible = valid_mask & eligible_mask
+        fallback_mask = eligible_mask & (~valid_eligible)
+
+        self.total_valid_slots += int(valid_eligible.sum().item())
+        self.total_fallback_events += int(fallback_mask.sum().item())
+
+        valid_ages = age[valid_eligible]
+        if valid_ages.numel() > 0:
+            self.total_age_sum += int(valid_ages.sum().item())
+            self.total_age_samples += int(valid_ages.numel())
+            self.max_age_seen = max(
+                self.max_age_seen,
+                int(valid_ages.max().item()),
+            )
+
+    def statistics(self) -> dict:
+        """Return JSON-friendly cumulative communication statistics."""
+        mean_age = (
+            self.total_age_sum / self.total_age_samples
+            if self.total_age_samples > 0
+            else None
+        )
+
+        return {
+            "mode": self.mode,
+            "payload_dim": self.payload_dim,
+            "payload_element_size_bytes": self.payload_element_size,
+            "apply_calls": self.total_apply_calls,
+            "slots": self.total_slots,
+            "eligible_slots": self.total_eligible_slots,
+            "messages_sent": self.total_messages_sent,
+            "messages_received": self.total_messages_received,
+            "bytes_sent": self.total_bytes_sent,
+            "bytes_received": self.total_bytes_received,
+            "valid_slots": self.total_valid_slots,
+            "fallback_events": self.total_fallback_events,
+            "mean_valid_information_age": mean_age,
+            "max_valid_information_age": self.max_age_seen,
+        }
 
     def _normalise_steps(
         self,
@@ -135,6 +225,21 @@ class CommunicationAdapter:
 
         device = current_payload.device
 
+        if self.payload_dim is None:
+            self.payload_dim = int(payload_dim)
+        elif self.payload_dim != int(payload_dim):
+            raise ValueError(
+                "Communication payload dimension changed after first use"
+            )
+
+        element_size = current_payload.element_size()
+        if self.payload_element_size is None:
+            self.payload_element_size = int(element_size)
+        elif self.payload_element_size != int(element_size):
+            raise ValueError(
+                "Communication payload element size changed after first use"
+            )
+
         if ego_indices is None:
             if n_ego != self.n_agents:
                 raise ValueError(
@@ -203,6 +308,17 @@ class CommunicationAdapter:
                 messages
                 * payload_dim
                 * current_payload.element_size()
+            )
+
+            self._record_statistics(
+                send_mask=send_mask,
+                valid_mask=eligible_mask,
+                age=age,
+                eligible_mask=eligible_mask,
+                messages_sent=messages,
+                messages_received=messages,
+                bytes_sent=bytes_sent,
+                bytes_received=bytes_sent,
             )
 
             return CommunicationResult(
@@ -326,6 +442,17 @@ class CommunicationAdapter:
             messages
             * payload_dim
             * current_payload.element_size()
+        )
+
+        self._record_statistics(
+            send_mask=send_mask,
+            valid_mask=usable,
+            age=cached_age,
+            eligible_mask=eligible_mask,
+            messages_sent=messages,
+            messages_received=messages,
+            bytes_sent=bytes_sent,
+            bytes_received=bytes_sent,
         )
 
         return CommunicationResult(
