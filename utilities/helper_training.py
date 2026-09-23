@@ -800,6 +800,8 @@ class Parameters:
         is_using_prioritized_marl: bool = False,  # Whether to use prioritized MARL and action propagation.
         prioritization_method: str = "marl",  # Which method to use for generating priority ranks (options: {"marl", "random"}). Applicable only for prioritized MARL scenarios.
         communication_mode: str = "perfect",
+        communication_period_steps: int = None,
+        communication_max_age_steps: int = None,
     ):
 
         self.n_agents = n_agents
@@ -880,6 +882,25 @@ class Parameters:
         self.is_using_prioritized_marl = is_using_prioritized_marl
 
         self.prioritization_method = prioritization_method
+
+        self.communication_period_steps = communication_period_steps
+        self.communication_max_age_steps = communication_max_age_steps
+
+        if (
+            communication_period_steps is not None
+            and int(communication_period_steps) <= 0
+        ):
+            raise ValueError(
+                "communication_period_steps must be positive"
+            )
+
+        if (
+            communication_max_age_steps is not None
+            and int(communication_max_age_steps) < 0
+        ):
+            raise ValueError(
+                "communication_max_age_steps must be non-negative"
+            )
 
         self.communication_mode = str(communication_mode).lower()
         allowed_communication_modes = {
