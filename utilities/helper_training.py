@@ -732,6 +732,7 @@ class Parameters:
         n_agents: int = 4,  # Number of agents
         dt: float = 0.05,  # [s] sample time
         device: str = "cpu",  # Tensor device
+        seed: int = 0,  # Reproducible training seed
         scenario_name: str = "road_traffic",  # Scenario name
         # Training parameters
         n_iters: int = 250,  # Number of training iterations
@@ -812,6 +813,11 @@ class Parameters:
         self.dt = dt
 
         self.device = device
+
+        self.seed = int(seed)
+        if self.seed < 0:
+            raise ValueError("seed must be non-negative")
+
         self.scenario_name = scenario_name
 
         # Sampling

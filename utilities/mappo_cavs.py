@@ -9,6 +9,8 @@ import time
 from termcolor import colored, cprint
 
 # Torch
+import random
+import numpy as np
 import torch
 
 # Enable anomaly detection
@@ -71,11 +73,25 @@ from utilities.helper_training import (
 
 from scenarios.road_traffic import ScenarioRoadTraffic
 
-# Reproducibility
-torch.manual_seed(0)
+
+
+def seed_everything(seed: int) -> None:
+    """Seed Python, NumPy, and Torch RNGs for one training run."""
+    seed = int(seed)
+    if seed < 0:
+        raise ValueError("seed must be non-negative")
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
 def mappo_cavs(parameters: Parameters):
+    seed_everything(parameters.seed)
+
     scenario = ScenarioRoadTraffic()
 
     scenario.parameters = parameters
@@ -104,6 +120,10 @@ def mappo_cavs(parameters: Parameters):
     )
 
     check_env_specs(env)
+
+    # TorchRL's specification check may reset Torch's RNG.
+    # Restore the configured seed before model initialization.
+    seed_everything(parameters.seed)
 
     observation_key = get_observation_key(parameters)
 
