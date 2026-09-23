@@ -130,7 +130,24 @@ try:
     evaluator.model_idx = 0
     evaluator.model_i_path = str(model) + "/"
     evaluator._load_parameters()
-    evaluator.parameters.communication_mode = "certificate"
+    communication_mode = os.environ.get(
+        "PAPER2_COMMUNICATION_MODE",
+        "certificate",
+    ).lower()
+
+    allowed_communication_modes = {
+        "perfect",
+        "periodic",
+        "age",
+        "certificate",
+    }
+
+    if communication_mode not in allowed_communication_modes:
+        raise ValueError(
+            f"Unsupported communication mode: {communication_mode}"
+        )
+
+    evaluator.parameters.communication_mode = communication_mode
     evaluator.parameters.communication_period_steps = None
     evaluator.parameters.communication_max_age_steps = None
     evaluator._adjust_parameters()
@@ -157,13 +174,20 @@ try:
         communication_statistics_path.read_text()
     )
 
-    assert communication_statistics["mode"] == "certificate"
+    assert communication_statistics["mode"] == communication_mode
     assert communication_statistics["active"] is True
-    assert communication_statistics["cache_active"] is True
-    assert communication_statistics["certificate_evaluations"] > 0
+
+    if communication_mode == "perfect":
+        assert communication_statistics["cache_active"] is False
+    else:
+        assert communication_statistics["cache_active"] is True
+
+    if communication_mode == "certificate":
+        assert communication_statistics["certificate_evaluations"] > 0
+
     assert communication_statistics["messages_sent"] > 0
 
-    manifest["communication_mode"] = "certificate"
+    manifest["communication_mode"] = communication_mode
     manifest["communication_statistics"] = communication_statistics
 
     (run / "communication_statistics.json").write_text(
