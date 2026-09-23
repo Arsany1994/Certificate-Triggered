@@ -135,6 +135,9 @@ class Evaluation:
 
         self.saved_data = None
 
+        self.communication_statistics = None
+        self.communication_statistics_path = None
+
         self.num_models = len(self.model_paths)
 
         self.x_ticks = kwargs.pop(
@@ -195,6 +198,57 @@ class Evaluation:
         self.parameters.is_visualize_extra_info = False
         self.parameters.render_title = self.render_titles[self.model_i]
 
+    @staticmethod
+    def _get_scenario_from_environment(env):
+        """Resolve ScenarioRoadTraffic through direct or transformed VMAS envs."""
+        base_env = getattr(env, "base_env", env)
+
+        scenario = getattr(base_env, "scenario_name", None)
+        if scenario is None:
+            scenario = getattr(base_env, "scenario", None)
+
+        if scenario is None:
+            raise RuntimeError(
+                "Could not locate the VMAS scenario from the evaluation environment."
+            )
+
+        return scenario
+
+    def _save_communication_statistics(
+        self,
+        env,
+        path_eval_out_td: str,
+    ) -> str:
+        """Save scenario communication statistics beside rollout outputs."""
+        scenario = self._get_scenario_from_environment(env)
+
+        if not hasattr(scenario, "communication_statistics"):
+            raise RuntimeError(
+                "The scenario does not expose communication_statistics()."
+            )
+
+        statistics = dict(scenario.communication_statistics())
+
+        statistics_path = os.path.join(
+            os.path.dirname(path_eval_out_td) or ".",
+            "communication_statistics.json",
+        )
+
+        with open(statistics_path, "w") as file:
+            json.dump(statistics, file, indent=2, sort_keys=True)
+
+        self.communication_statistics = statistics
+        self.communication_statistics_path = statistics_path
+
+        print(
+            colored(
+                f"[INFO] Communication statistics saved under {statistics_path}",
+                "grey",
+            )
+        )
+
+        return statistics_path
+
     def _evaluate_model_i(self):
         """
         Evaluate a model.
@@ -239,10 +293,22 @@ class Evaluation:
             + self.parameters.model_name
             + f"_out_td_{self.parameters.scenario_type}.pth"
         )
+        path_communication_statistics = os.path.join(
+            os.path.dirname(path_eval_out_td) or ".",
+            "communication_statistics.json",
+        )
+        self.communication_statistics_path = path_communication_statistics
+
         # Load simulation outputs if exist; otherwise run simulation
         if os.path.exists(path_eval_out_td) & (not self.is_render):
             cprint("[INFO] Simulation outputs exist and will be loaded.", "grey")
             out_td = torch.load(path_eval_out_td)
+
+            if os.path.exists(path_communication_statistics):
+                with open(path_communication_statistics, "r") as file:
+                    self.communication_statistics = json.load(file)
+            else:
+                self.communication_statistics = None
         else:
             env, policy, priority_module, _ = mappo_cavs(parameters=self.parameters)
 
@@ -287,6 +353,13 @@ class Evaluation:
                         is_save_simulation_video=False,
                     )
                 sim_end = time.time() - sim_begin
+
+            # Save communication statistics from the same scenario
+            # that generated this rollout.
+            self._save_communication_statistics(
+                env=env,
+                path_eval_out_td=path_eval_out_td,
+            )
 
             # Save simulation outputs
             torch.save(out_td, path_eval_out_td)
