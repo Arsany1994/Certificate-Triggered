@@ -341,6 +341,10 @@ class ScenarioRoadTraffic(BaseScenario):
         )
         self.n_agents = self.parameters.n_agents
 
+        # Lazily activated by the communication adapter.
+        # None preserves the original SigmaRL behavior.
+        self.communication_cache = None
+
         # Timer for the first env
         self.timer = Timer(
             start=time.time(),
@@ -1036,6 +1040,55 @@ class ScenarioRoadTraffic(BaseScenario):
             )
             world.add_agent(agent)
 
+    def _reset_communication_cache(
+        self,
+        env_index: int = None,
+        agent_index: int = None,
+    ):
+        """Reset communication state when an environment or agent is reset.
+
+        The method is intentionally a no-op until the communication adapter
+        creates ``self.communication_cache``.
+        """
+        cache = getattr(self, "communication_cache", None)
+
+        if cache is None:
+            return
+
+        if agent_index is None:
+            if env_index is None:
+                cache.reset()
+                return
+
+            env_value = int(torch.as_tensor(env_index).item())
+            env_mask = torch.zeros(
+                cache.batch_size,
+                device=cache.device,
+                dtype=torch.bool,
+            )
+
+            if not 0 <= env_value < cache.batch_size:
+                raise IndexError(
+                    f"env_index {env_value} is outside the cache batch"
+                )
+
+            env_mask[env_value] = True
+            cache.reset(env_mask)
+            return
+
+        if env_index is None:
+            raise ValueError(
+                "env_index is required when resetting one agent"
+            )
+
+        env_value = int(torch.as_tensor(env_index).item())
+        agent_value = int(torch.as_tensor(agent_index).item())
+
+        cache.reset_agents(
+            env_indices=[env_value],
+            agent_indices=[agent_value],
+        )
+
     def reset_world_at(self, env_index: int = None, agent_index: int = None):
         """
         This function resets the world at the specified env_index and the specified agent_index.
@@ -1051,6 +1104,11 @@ class ScenarioRoadTraffic(BaseScenario):
 
         if is_reset_single_agent:
             assert env_index is not None
+
+        self._reset_communication_cache(
+            env_index=env_index,
+            agent_index=agent_index,
+        )
 
         for env_i in (
             [env_index] if env_index is not None else range(self.world.batch_dim)
