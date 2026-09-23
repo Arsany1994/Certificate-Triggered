@@ -802,6 +802,10 @@ class Parameters:
         communication_mode: str = "perfect",
         communication_period_steps: int = None,
         communication_max_age_steps: int = None,
+        certificate_relative_speed_bound_mps: float = 2.0,
+        certificate_base_position_error_m: float = 0.0,
+        certificate_required_clearance_m: float = 0.0,
+        certificate_trigger_threshold_m: float = 0.0,
     ):
 
         self.n_agents = n_agents
@@ -885,6 +889,18 @@ class Parameters:
 
         self.communication_period_steps = communication_period_steps
         self.communication_max_age_steps = communication_max_age_steps
+        self.certificate_relative_speed_bound_mps = (
+            certificate_relative_speed_bound_mps
+        )
+        self.certificate_base_position_error_m = (
+            certificate_base_position_error_m
+        )
+        self.certificate_required_clearance_m = (
+            certificate_required_clearance_m
+        )
+        self.certificate_trigger_threshold_m = (
+            certificate_trigger_threshold_m
+        )
 
         if (
             communication_period_steps is not None
@@ -901,6 +917,27 @@ class Parameters:
             raise ValueError(
                 "communication_max_age_steps must be non-negative"
             )
+
+        certificate_parameters = {
+            "certificate_relative_speed_bound_mps": (
+                certificate_relative_speed_bound_mps
+            ),
+            "certificate_base_position_error_m": (
+                certificate_base_position_error_m
+            ),
+            "certificate_required_clearance_m": (
+                certificate_required_clearance_m
+            ),
+            "certificate_trigger_threshold_m": (
+                certificate_trigger_threshold_m
+            ),
+        }
+
+        for parameter_name, parameter_value in certificate_parameters.items():
+            if float(parameter_value) < 0:
+                raise ValueError(
+                    f"{parameter_name} must be non-negative"
+                )
 
         self.communication_mode = str(communication_mode).lower()
         allowed_communication_modes = {
