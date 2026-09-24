@@ -1070,35 +1070,51 @@ class ScenarioRoadTraffic(BaseScenario):
         env_index: int = None,
         agent_index: int = None,
     ):
-        """Reset communication state when an environment or agent is reset.
+        """Reset cache and pending communication state."""
 
-        The method is intentionally a no-op until the communication adapter
-        creates ``self.communication_cache``.
-        """
         cache = getattr(self, "communication_cache", None)
+        adapter = getattr(self, "communication_adapter", None)
 
-        if cache is None:
+        if cache is None and adapter is None:
             return
 
         if agent_index is None:
             if env_index is None:
-                cache.reset()
+                if adapter is not None:
+                    adapter.reset()
+                elif cache is not None:
+                    cache.reset()
                 return
 
             env_value = int(torch.as_tensor(env_index).item())
-            env_mask = torch.zeros(
-                cache.batch_size,
-                device=cache.device,
-                dtype=torch.bool,
+
+            batch_size = (
+                cache.batch_size
+                if cache is not None
+                else adapter.batch_size
+            )
+            device = (
+                cache.device
+                if cache is not None
+                else self.world.device
             )
 
-            if not 0 <= env_value < cache.batch_size:
+            if not 0 <= env_value < batch_size:
                 raise IndexError(
-                    f"env_index {env_value} is outside the cache batch"
+                    f"env_index {env_value} is outside the communication batch"
                 )
 
+            env_mask = torch.zeros(
+                batch_size,
+                device=device,
+                dtype=torch.bool,
+            )
             env_mask[env_value] = True
-            cache.reset(env_mask)
+
+            if adapter is not None:
+                adapter.reset(env_mask)
+            else:
+                cache.reset(env_mask)
             return
 
         if env_index is None:
@@ -1109,10 +1125,16 @@ class ScenarioRoadTraffic(BaseScenario):
         env_value = int(torch.as_tensor(env_index).item())
         agent_value = int(torch.as_tensor(agent_index).item())
 
-        cache.reset_agents(
-            env_indices=[env_value],
-            agent_indices=[agent_value],
-        )
+        if adapter is not None:
+            adapter.reset_agents(
+                env_indices=[env_value],
+                agent_indices=[agent_value],
+            )
+        else:
+            cache.reset_agents(
+                env_indices=[env_value],
+                agent_indices=[agent_value],
+            )
 
     def reset_world_at(self, env_index: int = None, agent_index: int = None):
         """
@@ -2435,6 +2457,10 @@ class ScenarioRoadTraffic(BaseScenario):
                 mode=self.parameters.communication_mode,
                 period_steps=self.parameters.communication_period_steps,
                 max_age_steps=self.parameters.communication_max_age_steps,
+                delay_steps=self.parameters.communication_delay_steps,
+                loss_probability=self.parameters.communication_loss_probability,
+                outage_windows=self.parameters.communication_outage_windows,
+                random_seed=self.parameters.communication_random_seed,
             )
 
         if (

@@ -803,6 +803,10 @@ class Parameters:
         communication_mode: str = "perfect",
         communication_period_steps: int = None,
         communication_max_age_steps: int = None,
+        communication_delay_steps: int = 0,
+        communication_loss_probability: float = 0.0,
+        communication_outage_windows=None,
+        communication_random_seed: int = None,
         certificate_relative_speed_bound_mps: float = 2.0,
         certificate_base_position_error_m: float = 0.0,
         certificate_required_clearance_m: float = 0.0,
@@ -895,6 +899,23 @@ class Parameters:
 
         self.communication_period_steps = communication_period_steps
         self.communication_max_age_steps = communication_max_age_steps
+        self.communication_delay_steps = int(
+            communication_delay_steps
+        )
+        self.communication_loss_probability = float(
+            communication_loss_probability
+        )
+        self.communication_outage_windows = (
+            []
+            if communication_outage_windows is None
+            else [list(window) for window in communication_outage_windows]
+        )
+        self.communication_random_seed = (
+            self.seed
+            if communication_random_seed is None
+            else int(communication_random_seed)
+        )
+
         self.certificate_relative_speed_bound_mps = (
             certificate_relative_speed_bound_mps
         )
@@ -907,6 +928,32 @@ class Parameters:
         self.certificate_trigger_threshold_m = (
             certificate_trigger_threshold_m
         )
+
+        if self.communication_delay_steps < 0:
+            raise ValueError(
+                "communication_delay_steps must be non-negative"
+            )
+
+        if not 0.0 <= self.communication_loss_probability <= 1.0:
+            raise ValueError(
+                "communication_loss_probability must be in [0, 1]"
+            )
+
+        if self.communication_random_seed < 0:
+            raise ValueError(
+                "communication_random_seed must be non-negative"
+            )
+
+        for window in self.communication_outage_windows:
+            if len(window) != 2:
+                raise ValueError(
+                    "communication_outage_windows entries must be [start, end]"
+                )
+            start, end = int(window[0]), int(window[1])
+            if start < 0 or end <= start:
+                raise ValueError(
+                    "outage windows require 0 <= start < end"
+                )
 
         if (
             communication_period_steps is not None
