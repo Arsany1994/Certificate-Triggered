@@ -38,8 +38,14 @@ branch = subprocess.check_output(
     text=True,
 ).strip()
 
-assert branch == "proposed-certificate-comm", (
-    f"Unexpected proposed branch: {branch}"
+allowed_branches = {
+    "proposed-certificate-comm",
+    "communication-impairments",
+}
+
+assert branch in allowed_branches, (
+    f"Unexpected proposed branch: {branch}; "
+    f"allowed branches: {sorted(allowed_branches)}"
 )
 assert commit != expected_commit, (
     "The evaluator is using the frozen baseline commit instead "
@@ -82,6 +88,7 @@ data_path.write_text(json.dumps(data, indent=2))
 manifest = {
     "status": "started",
     "git_commit": commit,
+    "git_branch": branch,
     "training_run": str(train_run),
     "checkpoint": f"{checkpoint_prefix}_policy.pth",
     "source_sha256": source_hashes,
@@ -167,12 +174,100 @@ try:
             return None
         return int(raw)
 
+    def parse_optional_float(name):
+        raw = os.environ.get(name)
+        if raw is None or raw.strip().lower() in {"", "none", "null"}:
+            return None
+        return float(raw)
+
+    def parse_outage_windows(name):
+        raw = os.environ.get(name)
+        if raw is None or raw.strip().lower() in {"", "none", "null", ""}:
+            return []
+
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"{name} must be JSON such as [[300, 340], [800, 840]]"
+            ) from exc
+
+        if not isinstance(parsed, list):
+            raise ValueError(f"{name} must contain a JSON list")
+
+        windows = []
+        for index, window in enumerate(parsed):
+            if not isinstance(window, list) or len(window) != 2:
+                raise ValueError(
+                    f"{name}[{index}] must be [start_step, end_step]"
+                )
+
+            start_step = int(window[0])
+            end_step = int(window[1])
+
+            if start_step < 0 or end_step <= start_step:
+                raise ValueError(
+                    f"{name}[{index}] requires 0 <= start < end"
+                )
+
+            windows.append([start_step, end_step])
+
+        return windows
+
     communication_period_steps = parse_optional_int(
         "PAPER2_COMMUNICATION_PERIOD_STEPS"
     )
     communication_max_age_steps = parse_optional_int(
         "PAPER2_COMMUNICATION_MAX_AGE_STEPS"
     )
+
+    communication_delay_steps = parse_optional_int(
+        "PAPER2_COMMUNICATION_DELAY_STEPS"
+    )
+    if communication_delay_steps is None:
+        communication_delay_steps = 0
+
+    communication_loss_probability = parse_optional_float(
+        "PAPER2_COMMUNICATION_LOSS_PROBABILITY"
+    )
+    if communication_loss_probability is None:
+        communication_loss_probability = 0.0
+
+    communication_outage_windows = parse_outage_windows(
+        "PAPER2_COMMUNICATION_OUTAGE_WINDOWS"
+    )
+
+    communication_random_seed = parse_optional_int(
+        "PAPER2_COMMUNICATION_RANDOM_SEED"
+    )
+    if communication_random_seed is None:
+        communication_random_seed = int(
+            getattr(evaluator.parameters, "seed", 0)
+        )
+
+    if communication_delay_steps < 0:
+        raise ValueError(
+            "PAPER2_COMMUNICATION_DELAY_STEPS must be non-negative"
+        )
+
+    if not 0.0 <= communication_loss_probability <= 1.0:
+        raise ValueError(
+            "PAPER2_COMMUNICATION_LOSS_PROBABILITY must be in [0, 1]"
+        )
+
+    if communication_random_seed < 0:
+        raise ValueError(
+            "PAPER2_COMMUNICATION_RANDOM_SEED must be non-negative"
+        )
+
+    if communication_mode == "perfect" and (
+        communication_delay_steps != 0
+        or communication_loss_probability != 0.0
+        or communication_outage_windows
+    ):
+        raise ValueError(
+            "Impairments are not allowed in perfect oracle mode"
+        )
 
     if communication_mode == "periodic":
         if (
@@ -201,6 +296,18 @@ try:
     evaluator.parameters.communication_max_age_steps = (
         communication_max_age_steps
     )
+    evaluator.parameters.communication_delay_steps = (
+        communication_delay_steps
+    )
+    evaluator.parameters.communication_loss_probability = (
+        communication_loss_probability
+    )
+    evaluator.parameters.communication_outage_windows = (
+        communication_outage_windows
+    )
+    evaluator.parameters.communication_random_seed = (
+        communication_random_seed
+    )
     evaluator._adjust_parameters()
 
     (run / "effective_evaluation_parameters.json").write_text(
@@ -227,6 +334,18 @@ try:
 
     assert communication_statistics["mode"] == communication_mode
     assert communication_statistics["active"] is True
+    assert communication_statistics["delay_steps"] == (
+        communication_delay_steps
+    )
+    assert communication_statistics["loss_probability"] == (
+        communication_loss_probability
+    )
+    assert communication_statistics["outage_windows"] == (
+        communication_outage_windows
+    )
+    assert communication_statistics["random_seed"] == (
+        communication_random_seed
+    )
 
     if communication_mode == "perfect":
         assert communication_statistics["cache_active"] is False
@@ -241,6 +360,14 @@ try:
     manifest["communication_mode"] = communication_mode
     manifest["communication_period_steps"] = communication_period_steps
     manifest["communication_max_age_steps"] = communication_max_age_steps
+    manifest["communication_delay_steps"] = communication_delay_steps
+    manifest["communication_loss_probability"] = (
+        communication_loss_probability
+    )
+    manifest["communication_outage_windows"] = (
+        communication_outage_windows
+    )
+    manifest["communication_random_seed"] = communication_random_seed
     manifest["communication_statistics"] = communication_statistics
 
     (run / "communication_statistics.json").write_text(
