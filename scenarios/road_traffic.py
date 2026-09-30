@@ -2526,7 +2526,7 @@ class ScenarioRoadTraffic(BaseScenario):
 
         cached_distance_normalized = cached_payload[..., distance_index]
         center_distance_m = (
-            cached_distance_normalized * self.normalizers.distance_agent
+            cached_distance_normalized * self.normalizers.distance_lanelet
         ).clamp_min(0.0)
 
         # Reuse the position-based certificate API with an arbitrary radial
