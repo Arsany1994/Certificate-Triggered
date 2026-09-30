@@ -11,7 +11,7 @@ import sys
 import time
 
 run = Path(os.environ["PAPER2_PROPOSED_RUN"]).resolve()
-repo = Path.home() / "paper2/development/sigmarl-proposed"
+repo = Path(__file__).resolve().parent
 train_run = Path(os.environ["PAPER2_TRAIN_RUN"]).resolve()
 source_model = train_run / "model"
 checkpoint_prefix = os.environ.get(
