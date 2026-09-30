@@ -41,6 +41,7 @@ branch = subprocess.check_output(
 allowed_branches = {
     "proposed-certificate-comm",
     "communication-impairments",
+    "corrected-normalization",
 }
 
 assert branch in allowed_branches, (
