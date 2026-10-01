@@ -1,0 +1,1170 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-01T11:19:29.381586+00:00",
+  "status": "planned",
+  "repo": "/home/arsany/paper2/corrected_normalization/development/source/sigmarl-proposed",
+  "git_branch": "corrected-normalization",
+  "git_commit": "363881d5cde7e39a0b218fea44936324382e55de",
+  "clean_plan": "/home/arsany/paper2/corrected_normalization/manifests/corrected_full_evaluation_plan_s0_s2.json",
+  "clean_plan_sha256": "f933939f02f8fe3db0a685d8db8237ecc4e6f49d7bc8ac0912d13dba492e9d9e",
+  "output_root": "/home/arsany/paper2/corrected_normalization/runs/impairment/corrected_certificate_s0_s2",
+  "new_jobs": 36,
+  "reused_clean_runs": 12,
+  "total_analysis_runs": 48,
+  "notes": [
+    "Frozen corrected policies; no training or fine-tuning.",
+    "Certificate communication only.",
+    "32 simulations per run; three independent training seeds.",
+    "Evaluation seed and channel random seed are both 0.",
+    "No additional channel-seed replication is included.",
+    "Clean references are reused from the corrected full comparison.",
+    "Identical initial evaluation seed does not imply identical trajectories.",
+    "Outage intervals are expressed in simulation steps.",
+    "Delivery shortfalls under delay must not automatically be called packet loss.",
+    "Historical incorrect-normalization impairment results remain separate."
+  ],
+  "clean_references": [
+    {
+      "job_id": "CPM_mixed_certificate_seed0",
+      "scenario": "CPM_mixed",
+      "training_seed": 0,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/CPM_mixed_certificate_seed0",
+      "policy_sha256": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+      "manifest_sha256": "338ae8cc14e51cd80572a794ed47ab2b3bdfc6681f416dc7022b0a4ba09dc6c0",
+      "statistics_sha256": "247ac9c11d79341716607beae1d60a78d8e8e486b8b33c8da87ead5d9c4dcb19",
+      "summary_sha256": "1f749daa9c0cb071417f46c3d96d3fc8af1d58ba2e9f3d74a3e33e741cea6e84"
+    },
+    {
+      "job_id": "CPM_mixed_certificate_seed1",
+      "scenario": "CPM_mixed",
+      "training_seed": 1,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/CPM_mixed_certificate_seed1",
+      "policy_sha256": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+      "manifest_sha256": "ce142b547db49730d3a028454dbe399c714c5b8e5be13df742c6bc3f491bf67a",
+      "statistics_sha256": "8882428b35552b8274790ccf583aa9b59566e51c9d335ae30f5204cc712a84d6",
+      "summary_sha256": "a758bf75d305b736ae284f31b495717f5d15c2786b27cbc562cd229c834f38ff"
+    },
+    {
+      "job_id": "CPM_mixed_certificate_seed2",
+      "scenario": "CPM_mixed",
+      "training_seed": 2,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/CPM_mixed_certificate_seed2",
+      "policy_sha256": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+      "manifest_sha256": "ea626f467986010f5c68d4d360834645468161720564e7e02f040227b3bbb95a",
+      "statistics_sha256": "e41cff82c4865933c550b396fc680f1c156ba963130db023d9c6f98e5360072d",
+      "summary_sha256": "2040348ce4a7c0ed9b9aa0781d26a4fbfa8c8a34544c5a541e424d9acc249951"
+    },
+    {
+      "job_id": "intersection_2_certificate_seed0",
+      "scenario": "intersection_2",
+      "training_seed": 0,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/intersection_2_certificate_seed0",
+      "policy_sha256": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+      "manifest_sha256": "6f0df301d069a7a480ab7bae1d534fa86f60a0aebeb1bdd5811db36a767a5e0f",
+      "statistics_sha256": "0a16b7043eec77ef7da1adb6678122a92bea0668477d1e4eb3d660599df0a1b2",
+      "summary_sha256": "a6dedd31cd045cd449576562660e05c3266e51fa9287b08a80ee620b78173edb"
+    },
+    {
+      "job_id": "intersection_2_certificate_seed1",
+      "scenario": "intersection_2",
+      "training_seed": 1,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/intersection_2_certificate_seed1",
+      "policy_sha256": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+      "manifest_sha256": "ac4314cb722d880abc3151448564528e995f7e9a7f368ce08b0dd6a96b6a2fd1",
+      "statistics_sha256": "82d0f21afe4519408ff178874ea93d2c37096e14b1a049c2d2b620648070b94d",
+      "summary_sha256": "71e67b6d6eb7f47406c041897a3eed32824c3d50d89ffb6b6668065cd5fd4fdb"
+    },
+    {
+      "job_id": "intersection_2_certificate_seed2",
+      "scenario": "intersection_2",
+      "training_seed": 2,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/intersection_2_certificate_seed2",
+      "policy_sha256": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+      "manifest_sha256": "c84ddb6e38fc190bb729e29b9d757a10b1ca10db7857d566f155db1972ad99f2",
+      "statistics_sha256": "a44bfb3b59a9594474139b53083f64adb7f5c8987a7b32ac17a93b6b254751e6",
+      "summary_sha256": "0af6fb70a33c27a2093a6d496aa0f295d60680792b255f0e43aa60c893a0903f"
+    },
+    {
+      "job_id": "on_ramp_1_certificate_seed0",
+      "scenario": "on_ramp_1",
+      "training_seed": 0,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/on_ramp_1_certificate_seed0",
+      "policy_sha256": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+      "manifest_sha256": "5007e27f9fede6ac34380af9af904ff436b353bc14e626cc316e075eb303f68d",
+      "statistics_sha256": "efc51a1aeb30b25c60fd6d58c9c2c20c43aea378652235779d91532906158adc",
+      "summary_sha256": "733358e7d49c3220c5d0d64c407a3a94000d2d57783021403b8d36b489d380c6"
+    },
+    {
+      "job_id": "on_ramp_1_certificate_seed1",
+      "scenario": "on_ramp_1",
+      "training_seed": 1,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/on_ramp_1_certificate_seed1",
+      "policy_sha256": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+      "manifest_sha256": "b6275702a3fa3bcb4180d8efb913ce97a8ce5b60426896fb4ebd68647f57f7dd",
+      "statistics_sha256": "7dd505cf4937e7bef530c5a773c52836641ca51e9ee5836541397d0344908714",
+      "summary_sha256": "27c189630e917798a033ec94fad30935b49f7cb21fec3d87d05dd6766e81b885"
+    },
+    {
+      "job_id": "on_ramp_1_certificate_seed2",
+      "scenario": "on_ramp_1",
+      "training_seed": 2,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/on_ramp_1_certificate_seed2",
+      "policy_sha256": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+      "manifest_sha256": "c7489f9a2f19e721cf65ff76fd45b7da16c70a274be66f47062dee8db0c48299",
+      "statistics_sha256": "29d633e31dddb2bab116050b91ad3821d97599c6187a6950ab7ba0a41882241a",
+      "summary_sha256": "6ef62f8651511baaf05db4dca0326e924d12d0a25a8b15499e23bd4809c2856c"
+    },
+    {
+      "job_id": "roundabout_1_certificate_seed0",
+      "scenario": "roundabout_1",
+      "training_seed": 0,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/roundabout_1_certificate_seed0",
+      "policy_sha256": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+      "manifest_sha256": "a2341f63b658368747326cd4c5de2b2c0ec1182d052bf4fa42023e7827c111d1",
+      "statistics_sha256": "206205b46814f398d9450f59130107d2cd5d7b3d9801705c5cb969d84e4a0825",
+      "summary_sha256": "636657c94c8e7ba10ae2c4231dfb534bcf3385ca46f72f57f216cb70017d9c58"
+    },
+    {
+      "job_id": "roundabout_1_certificate_seed1",
+      "scenario": "roundabout_1",
+      "training_seed": 1,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/roundabout_1_certificate_seed1",
+      "policy_sha256": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+      "manifest_sha256": "beba04709cc72b532c271fe63f2d3dc4ec37903a84aeaad4987ffc9126c0b338",
+      "statistics_sha256": "f104689257debd24d85d28f3ba4c6079f6c49082b46b82485d2a67a2cf43b2e5",
+      "summary_sha256": "f6ca75d2fd5a41f3bfd1aaf990ce5d82314d18114ea0dca0b049edd096f180c2"
+    },
+    {
+      "job_id": "roundabout_1_certificate_seed2",
+      "scenario": "roundabout_1",
+      "training_seed": 2,
+      "condition": "clean",
+      "run_directory": "/home/arsany/paper2/corrected_normalization/runs/evaluation/corrected_full_comparison_s0_s2/roundabout_1_certificate_seed2",
+      "policy_sha256": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+      "manifest_sha256": "1e8d7673b83cc2fe52de50619677a08171e372fa303079c3658be050e8c49856",
+      "statistics_sha256": "223f576ec2830616a380c915f4714cf914aaa019d27170b93fc0db3120963dbf",
+      "summary_sha256": "308d5347580b23ae4bc405fe5c05fb860c190e85673a6a7b839fad4b2d7b33de"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "CPM_mixed_delay2_seed0",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "CPM_mixed_loss10_seed0",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "CPM_mixed_outage_seed0",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "CPM_mixed_delay2_seed1",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "CPM_mixed_loss10_seed1",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "CPM_mixed_outage_seed1",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "CPM_mixed_delay2_seed2",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "CPM_mixed_loss10_seed2",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "CPM_mixed_outage_seed2",
+      "role": "impairment",
+      "scenario": "CPM_mixed",
+      "agents": 4,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "intersection_2_delay2_seed0",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "intersection_2_loss10_seed0",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "intersection_2_outage_seed0",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "intersection_2_delay2_seed1",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "intersection_2_loss10_seed1",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "intersection_2_outage_seed1",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "intersection_2_delay2_seed2",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "intersection_2_loss10_seed2",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "intersection_2_outage_seed2",
+      "role": "impairment",
+      "scenario": "intersection_2",
+      "agents": 6,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "on_ramp_1_delay2_seed0",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "on_ramp_1_loss10_seed0",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "on_ramp_1_outage_seed0",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "on_ramp_1_delay2_seed1",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "on_ramp_1_loss10_seed1",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "on_ramp_1_outage_seed1",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "on_ramp_1_delay2_seed2",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "on_ramp_1_loss10_seed2",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "on_ramp_1_outage_seed2",
+      "role": "impairment",
+      "scenario": "on_ramp_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "roundabout_1_delay2_seed0",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "roundabout_1_loss10_seed0",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "roundabout_1_outage_seed0",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 0,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed0",
+      "checkpoint_prefix": "reward5.04",
+      "checkpoint_sha256": {
+        "policy.pth": "4996c6e4d74aa61d51155d7d4ff94a86e641164d6140fc58bc1e38507c94cff8",
+        "critic.pth": "7ef123c8739640c31f0bb4d45a312f3a0df9206cd14a16bdff3a112186591bbe",
+        "data.json": "12a9aa834ea410e6bee79fce6d916c5bb1530a05e56bc6df06afa697960139d2"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "roundabout_1_delay2_seed1",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "roundabout_1_loss10_seed1",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "roundabout_1_outage_seed1",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 1,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed1",
+      "checkpoint_prefix": "reward5.31",
+      "checkpoint_sha256": {
+        "policy.pth": "f8b2de2db9702c9a28793624ad134cb660e6c1624e6a72ffebfc4f15ca8e044c",
+        "critic.pth": "e92b0a4c67af4933f083e2f984ad44aa3dec1d37bde0d48b7a99b51d1c500439",
+        "data.json": "fb9dcfd571078b603105469aa9fa8c357c089b751238d7d39ef060f5aace395f"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    },
+    {
+      "job_id": "roundabout_1_delay2_seed2",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 2,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "delay2"
+    },
+    {
+      "job_id": "roundabout_1_loss10_seed2",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.1,
+      "communication_outage_windows": [],
+      "communication_random_seed": 0,
+      "condition": "loss10"
+    },
+    {
+      "job_id": "roundabout_1_outage_seed2",
+      "role": "impairment",
+      "scenario": "roundabout_1",
+      "agents": 8,
+      "training_seed": 2,
+      "train_run": "/home/arsany/paper2/corrected_normalization/runs/training/corrected_certificate_s0_s2_0lbr4r69/seed2",
+      "checkpoint_prefix": "reward5.57",
+      "checkpoint_sha256": {
+        "policy.pth": "5bb63e6c9cd00db886927817c66e688fcb3795085c10869414b303be7ff03833",
+        "critic.pth": "cfd40b90e438a996fd6458411e13cafdf70de9a49920ba71afdc0ee9fe415e19",
+        "data.json": "87d36d69e15dab414df652e51cd29002e575a385ad280e48e3db9b3a459212b0"
+      },
+      "communication_mode": "certificate",
+      "communication_period_steps": null,
+      "communication_max_age_steps": null,
+      "parallel_simulations": 32,
+      "configured_steps": 1200,
+      "evaluation_seed": 0,
+      "communication_delay_steps": 0,
+      "communication_loss_probability": 0.0,
+      "communication_outage_windows": [
+        [
+          300,
+          340
+        ],
+        [
+          800,
+          840
+        ]
+      ],
+      "communication_random_seed": 0,
+      "condition": "outage"
+    }
+  ]
+}
