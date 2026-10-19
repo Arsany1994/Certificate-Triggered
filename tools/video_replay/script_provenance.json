@@ -1,0 +1,27 @@
+{
+  "description": "Exact historical replay scripts associated with Videos S1\u2013S8. Scripts are preserved unchanged. Original paths record provenance; portability and replay dependencies require separate inspection.",
+  "scripts": [
+    {
+      "filename": "animate_recorded_rollout_source_scale.py",
+      "sha256": "2fdb0281bab9f38dcf9f1aa7458fe4bb139a564b0c9274f9ee65d01a4bae38d8",
+      "videos": [
+        "S1",
+        "S5"
+      ],
+      "original_source_path": "/home/arsany/paper2/corrected_normalization/runs/recorded_rollout_videos/corrected_best1_worst1_ab328ig5/animate_recorded_rollout_source_scale.py"
+    },
+    {
+      "filename": "animate_recorded_rollout_verified_scale.py",
+      "sha256": "9d3fcc190aaca382b810c0ecac87dcce56b6c14ac2d3cb96d52abfa88b2b6d5e",
+      "videos": [
+        "S2",
+        "S3",
+        "S4",
+        "S6",
+        "S7",
+        "S8"
+      ],
+      "original_source_path": "/home/arsany/paper2/corrected_normalization/runs/recorded_rollout_videos/corrected_all_198/animate_recorded_rollout_verified_scale.py"
+    }
+  ]
+}

@@ -1,166 +1,173 @@
-# SigmaRL: A Sample-Efficient and Generalizable Multi-Agent Reinforcement Learning Framework for Motion Planning
-<!-- icons from https://simpleicons.org/ -->
+# Certificate-Triggered
 
-- [SigmaRL: A Sample-Efficient and Generalizable Multi-Agent Reinforcement Learning Framework for Motion Planning](#sigmarl-a-sample-efficient-and-generalizable-multi-agent-reinforcement-learning-framework-for-motion-planning)
-  - [Welcome to SigmaRL!](#welcome-to-sigmarl)
-  - [Install](#install)
-  - [How to Use](#how-to-use)
-    - [Training](#training)
-    - [Testing](#testing)
-  - [Customize Your Own Maps](#customize-your-own-maps)
-  - [News](#news)
-  - [Publications](#publications)
-    - [1. SigmaRL](#1-sigmarl)
-    - [2. XP-MARL](#2-xp-marl)
-  - [TODOs](#todos)
-  - [Acknowledgements](#acknowledgements)
+Reproducibility materials for certificate-triggered neighbor-information
+refresh in cooperative multi-agent driving.
 
-> [!NOTE]
-> Check out our recent work [XP-MARL](#2-xp-marl)! It is an open-source framework that augments MARL with au<ins>x</ins>iliary <ins>p</ins>rioritization to address *non-stationarity* in cooperative MARL.
+## Contribution and upstream framework
 
-## Welcome to SigmaRL!
-This repository provides the full code of **SigmaRL**, a <ins>S</ins>ample eff<ins>i</ins>ciency and <ins>g</ins>eneralization <ins>m</ins>ulti-<ins>a</ins>gent <ins>R</ins>einforcement <ins>L</ins>earning (MARL) for motion planning of Connected and Automated Vehicles (CAVs).
+This repository contains the SigmaRL framework together with the
+experimental communication implementation and reproduction tools.
+It is a derivative research repository, not an official SigmaRL release.
 
-SigmaRL is a decentralized MARL framework designed for motion planning of CAVs. We use <a href="https://github.com/proroklab/VectorizedMultiAgentSimulator" target="_blank">VMAS</a>, a vectorized differentiable simulator designed for efficient MARL benchmarking, as our simulator und customize our own RL environment. The first scenario in [Fig. 1](#) mirrors the real-world coditions of our Cyber-Physical Mobility Lab (<a href="https://cpm.embedded.rwth-aachen.de/" target="_blank">CPM Lab</a>). Besides, we also support maps handcrafted in <a href="https://josm.openstreetmap.de/" target="_blank">JOSM</a>, an open-source editor for OpenStreetMap. [Below](#customize-your-own-maps) you will find detailed guidance to create your **OWN** maps.
+SigmaRL supplies the underlying multi-agent driving framework, shared-policy
+MAPPO baseline, simulator integration, traffic scenarios, and baseline
+observation and reward definitions. The contribution studied here is the
+certificate-triggered communication mechanism: timestamped neighbor caches,
+a clearance calculation using the last delivered scalar inter-agent distance
+and an age-dependent uncertainty allowance, and selective refresh requests.
 
-<table>
-  <tr>
-    <td>
-      <figure id="fig-scenario-cpm">
-        <img src="https://github.com/cas-lab-munich/assets/blob/main/sigmarl/media/cpm_entire.gif?raw=true" width="360" height="320" />
-        <figcaption>(a) CPM scenario.</figcaption>
-      </figure>
-    </td>
-    <td>
-      <figure id="fig-scenario-intersection">
-        <img src="https://github.com/cas-lab-munich/assets/blob/main/sigmarl/media/intersection_2.gif?raw=true" height="320"/>
-        <figcaption>(b) Intersection scenario.</figcaption>
-      </figure>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <figure id="fig-scenario-on-ramp">
-        <img src="https://github.com/cas-lab-munich/assets/blob/main/sigmarl/media/on_ramp_1.gif?raw=true" width="360"/>
-        <figcaption>(c) On-ramp scenario.</figcaption>
-      </figure>
-    </td>
-    <td>
-      <figure id="fig-scenario-roundabout">
-        <img src="https://github.com/cas-lab-munich/assets/blob/main/sigmarl/media/roundabout_1.gif?raw=true" height="140"/>
-        <figcaption>(d) "Roundabout" scenario.</figcaption>
-      </figure>
-    </td>
-  </tr>
-</table>
+The communication mechanism determines information updates used by the
+actor. The existing policy supplies the driving actions.
 
-<p><strong>Fig. 1:</strong> Example scenarios (speed x2). All scenarios are listed in the variable <code>SCENARIOS</code> in <code>utilities/constants.py</code>.</p>
+The original upstream README, including its references and usage guidance,
+is preserved in [README-SigmaRL.md](README-SigmaRL.md).
+The upstream copyright and MIT license are preserved in
+[LICENSE.txt](LICENSE.txt).
 
+Upstream repository recorded by this archive:
+https://github.com/bassamlab/SigmaRL
 
+## Recorded source versions
 
-## Install
-We use Python 3.9. Other versions may also work well. After git clone this repository, install the necessary packages using
-```
-pip install -r requirements.txt
-```
-We have tested that this repository works well in Windows and macOS.
+| Role | Version or commit |
+|---|---|
+| SigmaRL baseline | Version 1.2.0 |
+| Baseline commit | 5fe715bdfba4ff3e33d901d69dfa220f1222c060 |
+| Experimental implementation | 363881d5cde7e39a0b218fea44936324382e55de |
+| Evaluation and analysis archive | 94452411f5535342a6ddbb84a81beb4c8ba8f32e |
 
-## How to Use
-### Training
-Run `/main_training.py`. During training, all the intermediate models that have higher performance than the saved one will be automatically saved. You are also allowed to retrain or refine a trained model by setting the parameter `is_continue_train` in the `config.json` from the root directory file to `true`. The saved model will be loaded for a new training process.
+The experimental commit identifies the implementation used to generate
+the corrected-normalization results. The later archive commit adds the
+associated evaluation and analysis scripts and frozen plans.
 
-`/scenarios/road_traffic.py` defines the RL environment, such as observation function and reward function. Besides, it provides an interactive interface, which also visualizes the environment. To open the interface, simply run this file. You can use `arrow keys` to control agents and use the `tab key` to switch between agents. Adjust the parameter `scenario_type` to choose a scenario. All available scenarios are listed in the variable `SCENARIOS` in `utilities/constants.py`. It is recommended to use the virtual visualization to check if the environment is as expected before training.
-### Testing
-After training, run `/main_testing.py` to test your model. You may need to adjust the parameter `path` therein to tell which folder the target model was saved.
-*Note*: If the path to a saved model changes, you need to update the value of `where_to_save` in the corresponding JSON file as well.
+Release preparation adds documentation and portable reproduction tooling.
+It does not change the historical experimental commit or rewrite the
+original run records.
 
-## Customize Your Own Maps
-We support maps customized in <a href="https://josm.openstreetmap.de/" target="_blank">JOSM</a>, an open-source editor for ​OpenStreetMap. Follow these steps:
-- Install and open JOSM, click the green download button
-- Zoom in and find an empty area (as empty as possible)
-- Select the area by drawing a rectangle
-- Click "Download"
-- Now you will see a new window. Make sure there is no element. Otherwise, redo the above steps.
-- Customize lanes. Note that all lanes you draw are considered center lines. You do not need to draw left and right boundaries, since they will be determined automatically later by our script with a given width.
-- Save the osm file and store it at `assets/maps`. Give it a name.
-- Go to `utilities/constants.py` and create a new dictionary for it. You should at least give the value for the key `map_path`, `lane_width`, and `scale`.
-- Go to `utilities/parse_osm.py`. Adjust the parameters `scenario_type` and run it.
+## Archive contents
 
-## News
-- [2024-09-15] Check out our recent work [XP-MARL](#2-xp-marl), an open-source framework that augments MARL with au<ins>x</ins>iliary <ins>p</ins>rioritization to address *non-stationarity* in cooperative MARL!
-- [2024-08-14] We support customized maps in OpenStreetMap now (see [here](#customize-your-own-maps))!
-- [2024-07-10] Our [CPM Scenario](#fig-scenario-cpm) is now available as an MARL benchmark scenario in VMAS (see <a href="https://github.com/proroklab/VectorizedMultiAgentSimulator/releases/tag/1.4.2" target="_blank">here</a>)!
-- [2024-07-10] Our work [SigmaRL](#1-sigmarl) was accepted by the 27th IEEE International Conference on Intelligent Transportation Systems (IEEE ITSC 2024)!
+The source repository contains:
 
-## Publications
-We would be grateful if you would refer to the papers below if you find this repository helpful.
+- The SigmaRL-derived experimental source and Git history.
+- Historical scripts and plans under tools/corrected_normalization/.
+- Portable launchers under tools/reproduction/.
+- Historical video replay scripts under tools/video_replay/.
+- Environment exports under environment/.
 
+The separately packaged supplementary directories contain:
 
-### 1. SigmaRL
-<div>
-Jianye Xu, Pan Hu, and Bassam Alrifaee, "SigmaRL: A Sample-Efficient and Generalizable Multi-Agent Reinforcement Learning Framework for Motion Planning," <i>arXiv preprint arXiv:2408.07644</i>, 2024.
+| Directory | Contents |
+|---|---|
+| data_payload | Selected checkpoints, training configurations and logs, frozen plans, run-level results, per-run evidence, and reproduction validation records |
+| video_payload | Videos S1–S8, frame data, original replay metadata, and filename mapping |
+| replay_payload | Seven original full-batch rollouts and the run records needed to replay the eight videos |
 
-<a href="https://doi.org/10.48550/arXiv.2408.07644" target="_blank"><img src="https://img.shields.io/badge/-Preprint-b31b1b?logo=arXiv"></a> <a href="https://youtu.be/tzaVjol4nhA" target="_blank"><img src="https://img.shields.io/badge/-Video-FF0000?logo=YouTube"></a> <a href="https://github.com/cas-lab-munich/SigmaRL/tree/1.2.0" target="_blank"><img src="https://img.shields.io/badge/-GitHub-181717?logo=GitHub"></a>
-</div>
+S3 and S7 select different simulations from the same rollout.
+Large binary assets are packaged separately from Git source.
 
-- **BibTeX**
-  ```bibtex
-  @article{xu2024sigmarl,
-    title={SigmaRL: A Sample-Efficient and Generalizable Multi-Agent Reinforcement Learning Framework for Motion Planning},
-    author={Xu, Jianye and Hu, Pan and Alrifaee, Bassam},
-    journal={arXiv preprint arXiv:2408.07644},
-    year={2024},
-  }
-  ```
+## Experimental environment
 
-- **Reproduce Experimental Results in the Paper:**
+The recorded CPU environment uses:
 
-  - Git checkout to the corresponding tag using `git checkout 1.2.0`
-  - Go to [this page](https://github.com/cas-lab-munich/assets/blob/main/sigmarl/checkpoints.zip) and download the zip file `checkpoints.zip`. Unzip it, copy and paste the whole folder `checkpoints` to the **root** of this repository.
-  - Run `utilities/evaluation_itsc24.py`.
+| Component | Version |
+|---|---|
+| Python | 3.9.25 |
+| PyTorch | 2.1.0+cpu |
+| TorchRL | 0.2.1 |
+| TensorDict | 0.2.1 |
+| VMAS | 1.4.1 |
+| NumPy | 1.26.1 |
+| Gym | 0.26.2 |
 
-  You can also run `/testing_mappo_cavs.py` to intuitively evaluate the trained models. Adjust the parameter `path` therein to specify which folder the target model was saved.
-  *Note*: The evaluation results you get may slightly deviate from the paper since we carefully improved computation of the performance metrics.
+Environment exports document the installed environment. The Conda explicit
+export alone does not capture the pip-installed packages. Original exports
+are retained; requirements-portable.txt replaces the machine-local pip
+package reference with its recorded version.
 
+Fresh-environment installation has not yet been validated.
 
-### 2. XP-MARL
-<div>
-Jianye Xu, Omar Sobhy, and Bassam Alrifaee, "XP-MARL: Auxiliary Prioritization in Multi-Agent Reinforcement Learning to Address Non-Stationarity," <i>arXiv preprint arXiv:2409.11852</i>, 2024.
+## Reproduce evaluation
 
-<a href="https://doi.org/10.48550/arXiv.2409.11852" target="_blank"><img src="https://img.shields.io/badge/-Preprint-b31b1b?logo=arXiv"></a> <a href="https://youtu.be/tzaVjol4nhA" target="_blank"><img src="https://img.shields.io/badge/-Video-FF0000?logo=YouTube"></a> <a href="https://github.com/cas-lab-munich/SigmaRL/tree/1.2.0" target="_blank"><img src="https://img.shields.io/badge/-GitHub-181717?logo=GitHub"></a>
-</div>
+tools/reproduction/run_job.py selects a job from a frozen evaluation plan,
+verifies its checkpoint hashes, and executes the historical evaluator from
+a separate source checkout.
 
-- **BibTeX**
-  ```bibtex
-  @article{xu2024xpmarl,
-    title={XP-MARL: Auxiliary Prioritization in Multi-Agent Reinforcement Learning to Address Non-Stationarity},
-    author={Xu, Jianye and Sobhy, Omar and Alrifaee, Bassam},
-    journal={arXiv preprint arXiv:2409.11852},
-    year={2024},
-  }
-  ```
+The source checkout must be at experimental commit
+363881d5cde7e39a0b218fea44936324382e55de on branch corrected-normalization.
+The launcher defaults to a dry run; evaluation requires --execute.
 
-- **Reproduce Experimental Results in the Paper:**
+Inspect the available arguments:
 
-  - Git checkout to the corresponding tag using `git checkout 1.2.0`
-  - Go to [this page](https://github.com/cas-lab-munich/assets/blob/main/sigmarl/checkpoints.zip) and download the zip file `checkpoints.zip`. Unzip it, copy and paste the whole folder `checkpoints` to the **root** of this repository.
-  - Run `utilities/evaluation_icra25.py`.
+    python tools/reproduction/run_job.py --help
 
-  You can also run `/testing_mappo_cavs.py` to intuitively evaluate the trained models. Adjust the parameter `path` therein to specify which folder the target model was saved.
+The training-root layout expected by the evaluator is:
 
-## TODOs
-- Effective observation design
-  - [ ] Image-based representation of observations
-  - [ ] Historic observations
-  - [ ] Attention mechanism
-- Improve safety
-  - [ ] Integrating Control Barrier Functions (CBFs)
-  - [ ] Integrating Model Predictive Control (MPC)
-- Address non-stationarity
-  - [x] Integrating prioritization (see the XP-MARL paper [here](#2-xp-marl))
-- Misc
-  - [x] OpenStreetMap support (see guidance [here](#customize-your-own-maps))
-  - [x] Contribute our [CPM scenario](#fig-scenario-cpm) as an MARL benchmark scenario in VMAS (see news <a href="https://github.com/proroklab/VectorizedMultiAgentSimulator/releases/tag/1.4.2" target="_blank">here</a>)
+    seed0/model/reward5.04_policy.pth
+    seed0/model/reward5.04_critic.pth
+    seed0/model/reward5.04_data.json
 
-## Acknowledgements
-This research was supported by the Bundesministerium für Digitales und Verkehr (German Federal Ministry for Digital and Transport) within the project "Harmonizing Mobility" (grant number 19FS2035A).
+Use corresponding seed1/reward5.31 and seed2/reward5.57 files.
+The supplied checkpoint files are under data_payload/checkpoints/seedN;
+copy or link each seed directory into the required model location.
+
+Historical runners contain original machine-specific paths. Use the
+portable launcher for relocated execution.
+
+## Reproduce analysis
+
+With the experiment environment active, run:
+
+    python tools/reproduction/run_analysis.py --data /absolute/path/to/data_payload --output /absolute/path/to/new-analysis-output
+
+The output directory must not already exist and must be outside the
+repository and data_payload.
+
+The launcher verifies historical script hashes and creates separate
+adapted copies that relocate paths. Original scripts, frozen plans, and
+input CSVs remain unchanged. It records the adaptations and execution
+status and produces clean-comparison tables, impairment tables and figures,
+and the training-reward table and figure.
+
+## Replay supplementary videos
+
+See [video replay instructions](tools/video_replay/README.md).
+Replaying saved trajectories does not require another policy evaluation.
+
+The replay scripts and original rollout hashes are preserved. Encoded
+video bytes can differ across rendering and encoder versions.
+
+## Validation performed during archive preparation
+
+On the original experiment machine and environment:
+
+- One relocated clean evaluation job, CPM_mixed_certificate_seed0,
+  matched all 32 per-simulation metric rows, its summary, and communication
+  statistics exactly.
+- All seven generated analysis CSV tables matched the original tables.
+  Historical run-directory strings remained unchanged.
+- All eight archived videos passed provenance, output-hash, and encoded
+  frame-count checks.
+- The seven source rollouts required for video replay were copied and
+  verified against their recorded hashes.
+
+This records the checks actually performed. It does not claim that every
+evaluation job or a fresh environment installation was rerun.
+
+## Statistical reporting
+
+The clean comparison contains 63 evaluation runs. The impairment analysis
+contains 36 impaired runs and 12 reused clean references, giving 48 rows.
+
+Each evaluation run contains 32 simulations. Reported across-seed
+statistics summarize three training-seed means; sample standard deviation
+is not a confidence interval.
+
+## Historical paths and provenance
+
+Absolute paths in original plans, manifests, and CSVs document the original
+execution. They are retained unchanged. Portable launchers handle relocated
+inputs separately and record the new execution paths.
+
+The upstream README describes SigmaRL usage. For this study's corrected
+experiments, use the pinned commits, archived plans, selected checkpoints,
+and reproduction tools described here.

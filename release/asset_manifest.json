@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "experimental_source_commit": "363881d5cde7e39a0b218fea44936324382e55de",
+  "historical_analysis_archive_commit": "94452411f5535342a6ddbb84a81beb4c8ba8f32e",
+  "assets": [
+    {
+      "filename": "Certificate-Triggered-data-v1.0.0.zip",
+      "sha256": "85973a75569b68f813acddd4386e63c17cca258362021aaec9a6e3afb0dbea97",
+      "bytes": 3422382,
+      "files": 658,
+      "top_level_directory": "data_payload"
+    },
+    {
+      "filename": "Certificate-Triggered-videos-v1.0.0.zip",
+      "sha256": "0bafd7ed86e85487c73034299ffa3ad428cdd5fde964c41bf33a34463b65c07c",
+      "bytes": 27477103,
+      "files": 73,
+      "top_level_directory": "video_payload"
+    },
+    {
+      "filename": "Certificate-Triggered-replay-inputs-v1.0.0.zip",
+      "sha256": "ced993c9d42eae6c2d9f1865c9ff2d65c24ed10a8df4797f126717af1b3661ad",
+      "bytes": 427625936,
+      "files": 23,
+      "top_level_directory": "replay_payload"
+    }
+  ]
+}
