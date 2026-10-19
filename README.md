@@ -3,6 +3,68 @@
 Reproducibility materials for certificate-triggered neighbor-information
 refresh in cooperative multi-agent driving.
 
+## Supplementary Videos S1–S8
+
+Recorded trajectories under clean-channel, certificate-triggered
+communication. Videos S1–S4 show favorable examples and S5–S8 show
+adverse examples selected using collision-union frame percentage.
+Simulation indices are zero-based.
+
+Each replay displays all 1,199 recorded frames at 20 frames/s without
+rerunning the policy. These selected examples illustrate vehicle
+interactions; the quantitative results use all 32 simulations per
+evaluation run across three training seeds.
+
+[Download the videos, supporting data, and replay inputs from release v1.0.0](https://github.com/Arsany1994/Certificate-Triggered/releases/tag/v1.0.0).
+
+### Video S1 — CPM_mixed (favorable)
+
+4 agents · Training seed 2 · Simulation 02
+
+https://github.com/user-attachments/assets/54390747-a1bf-4749-82e1-c5304547b1c6
+
+### Video S2 — intersection_2 (favorable)
+
+6 agents · Training seed 2 · Simulation 16
+
+https://github.com/user-attachments/assets/d11d3dab-66ee-45d7-8be3-3e7b6ae4898b
+
+### Video S3 — on_ramp_1 (favorable)
+
+8 agents · Training seed 0 · Simulation 00
+
+https://github.com/user-attachments/assets/17126a81-8354-4e99-9154-50555c81420b
+
+### Video S4 — roundabout_1 (favorable)
+
+8 agents · Training seed 2 · Simulation 26
+
+https://github.com/user-attachments/assets/97b3d1e2-5c1a-4506-94ee-acae6d6dedef
+
+### Video S5 — CPM_mixed (adverse)
+
+4 agents · Training seed 0 · Simulation 20
+
+https://github.com/user-attachments/assets/c603082c-ab8b-4b65-8bae-e1c4077d8b17
+
+### Video S6 — intersection_2 (adverse)
+
+6 agents · Training seed 1 · Simulation 15
+
+https://github.com/user-attachments/assets/554f2999-2899-4f7f-8757-45ad89763c9d
+
+### Video S7 — on_ramp_1 (adverse)
+
+8 agents · Training seed 0 · Simulation 23
+
+https://github.com/user-attachments/assets/f5a4ec79-23fb-47af-94f9-6cf2bb16a03a
+
+### Video S8 — roundabout_1 (adverse)
+
+8 agents · Training seed 1 · Simulation 27
+
+https://github.com/user-attachments/assets/00dbd10a-6fb8-4e11-aa05-b097c70d82de
+
 ## Contribution and upstream framework
 
 This repository contains the SigmaRL framework together with the
